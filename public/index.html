@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Al-Noor Islamiyya School - Student Portal</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0fdf4; min-height: 100vh; }
+    .page { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+    .page.active { display: block; }
+
+    nav { background: #166534; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .nav-brand { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-logo { width: 40px; height: 40px; background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
+    .nav-brand h1 { margin: 0; font-size: 1.25rem; }
+    .nav-brand p { margin: 0; font-size: 0.75rem; opacity: 0.9; }
+    .nav-actions { display: flex; gap: 0.5rem; }
+    .nav-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+    .nav-btn:hover { background: rgba(255,255,255,0.25); }
+
+    .hero { text-align: center; padding: 3rem 1rem; background: linear-gradient(135deg, #166534 0%, #22c55e 100%); border-radius: 16px; color: white; margin-bottom: 2rem; }
+    .hero h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+    .hero p { font-size: 1.1rem; opacity: 0.95; }
+    .hero-buttons { display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap; }
+    .btn-primary { background: white; color: #166534; padding: 1rem 2rem; border-radius: 12px; border: none; font-size: 1.1rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-width: 220px; }
+    .btn-secondary { background: rgba(255,255,255,0.2); color: white; padding: 1rem 2rem; border-radius: 12px; border: 2px solid white; font-size: 1.1rem; font-weight: 600; cursor: pointer; min-width: 220px; }
+
+    .card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .card h3 { color: #166534; margin: 0; }
+    .card h4 { color: #166534; margin: 0 0 1rem 0; }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-weight: 600; color: #374151; margin-bottom: 0.25rem; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; font-family: inherit; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+    .btn-submit { width: 100%; background: #166534; color: white; padding: 1rem; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; }
+    .btn-submit:hover { background: #14532d; }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .announcement-item { border-left: 4px solid #22c55e; padding-left: 1rem; margin-bottom: 1rem; }
+    .announcement-item h4 { margin: 0 0 0.25rem 0; color: #1f2937; }
+    .announcement-item p { margin: 0; color: #6b7280; font-size: 0.9rem; }
+    .announcement-item .date { font-size: 0.75rem; color: #9ca3af; }
+
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+    .info-card { background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .info-card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .info-card h4 { color: #166534; margin: 0.5rem 0; }
+    .info-card p { color: #6b7280; font-size: 0.9rem; }
+
+    .admission-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 3px solid #166534; }
+    .admission-header { text-align: center; border-bottom: 2px solid #166534; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+    .admission-header h2 { color: #166534; margin: 0; }
+    .admission-header p { margin: 0.25rem 0; color: #6b7280; font-size: 0.9rem; }
+    .admission-body { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .admission-photo { width: 120px; height: 150px; object-fit: cover; border: 2px solid #166534; border-radius: 8px; background: #f3f4f6; }
+    .admission-details { flex: 1; min-width: 200px; }
+    .admission-details p { margin: 0.3rem 0; }
+    .admission-details strong { color: #166534; }
+    .parents-box { background: #f0fdf4; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+    .parents-box h4 { color: #166534; margin: 0 0 0.5rem 0; }
+    .signature-area { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 2rem; border-top: 1px dashed #d1d5db; padding-top: 1rem; }
+    .signature { text-align: center; }
+    .signature .sign-line { width: 120px; height: 40px; border-bottom: 2px solid #000; margin-bottom: 0.25rem; font-family: 'Brush Script MT', cursive; font-size: 1.2rem; color: #1f2937; display: flex; align-items: flex-end; justify-content: center; }
+
+    .amount-box { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem; text-align: center; }
+    .amount-box .label { margin: 0; color: #92400e; font-size: 0.9rem; }
+    .amount-box .amount { margin: 0.25rem 0 0 0; color: #78350f; font-size: 2rem; font-weight: 700; }
+    .pay-methods { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .pay-method { flex: 1; padding: 0.75rem; border: 2px solid #d1d5db; border-radius: 8px; background: white; color: #6b7280; cursor: pointer; font-weight: 500; }
+    .pay-method.active { border-color: #166534; background: #f0fdf4; color: #166534; font-weight: 600; }
+    .remita-box { background: #f8fafc; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+
+    .receipt-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 3px solid #22c55e; text-align: center; }
+    .success-icon { width: 60px; height: 60px; background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; font-size: 1.5rem; color: white; }
+    .receipt-details { background: #f0fdf4; border-radius: 10px; padding: 1.5rem; margin: 1.5rem 0; text-align: left; }
+    .receipt-details p { margin: 0.3rem 0; }
+
+    .login-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08); max-width: 400px; margin: 3rem auto; }
+    .login-header { text-align: center; margin-bottom: 1.5rem; }
+    .login-icon { width: 60px; height: 60px; background: #166534; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 1.5rem; color: white; }
+    .login-header h2 { color: #166534; margin: 0.5rem 0 0 0; }
+    .login-header p { color: #6b7280; font-size: 0.9rem; }
+    .error-msg { color: #dc2626; text-align: center; margin-top: 0.75rem; font-size: 0.9rem; display: none; }
+
+    .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .dash-header h2 { color: #166534; margin: 0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid; }
+    .stat-card p { margin: 0; color: #6b7280; font-size: 0.85rem; }
+    .stat-card .value { margin: 0.25rem 0 0 0; font-size: 1.75rem; font-weight: 700; }
+    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .chart-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .chart-card h4 { color: #166534; margin: 0 0 1rem 0; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 0.5rem; height: 180px; padding-top: 1rem; }
+    .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+    .bar { width: 100%; background: #22c55e; border-radius: 4px 4px 0 0; min-height: 20px; }
+    .bar-label { font-size: 0.65rem; color: #6b7280; }
+    .horizontal-bar { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .horizontal-bar .label { width: 60px; font-size: 0.8rem; color: #374151; text-align: right; }
+    .horizontal-bar .track { flex: 1; background: #f3f4f6; border-radius: 4px; height: 20px; overflow: hidden; }
+    .horizontal-bar .fill { height: 100%; border-radius: 4px; }
+    .horizontal-bar .count { width: 40px; font-size: 0.75rem; color: #6b7280; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { padding: 0.75rem; text-align: left; border-bottom: 2px solid #bbf7d0; color: #166534; background: #f0fdf4; }
+    td { padding: 0.75rem; border-bottom: 1px solid #f3f4f6; }
+    .badge { background: #dcfce7; color: #166534; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .table-wrap { overflow-x: auto; }
+
+    .ann-item { border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.75rem; margin-bottom: 0.5rem; background: #fafafa; }
+    .ann-item-header { display: flex; justify-content: space-between; align-items: start; }
+    .ann-item h5 { margin: 0; color: #166534; }
+    .ann-item p { margin: 0.25rem 0 0 0; font-size: 0.85rem; color: #4b5563; }
+    .ann-item .date { font-size: 0.7rem; color: #9ca3af; }
+    .btn-delete { background: #fee2e2; color: #dc2626; border: none; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; cursor: pointer; }
+    .btn-small { background: #166534; color: white; padding: 0.75rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+
+    .loading { text-align: center; padding: 2rem; color: #6b7280; }
+    .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #bbf7d0; border-top-color: #166534; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 0.5rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .back-link { color: #166534; cursor: pointer; text-decoration: underline; margin-bottom: 1rem; display: inline-block; }
+    .flex-center { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .mt-2 { margin-top: 1.5rem; }
+    .btn-download { padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; color: white; }
+    .btn-green { background: #166534; }
+    .btn-lime { background: #22c55e; }
+    .btn-blue { background: #0ea5e9; }
+    .btn-red { background: #dc2626; color: white; padding: 0.5rem 1rem; border: 1px solid #fecaca; border-radius: 8px; cursor: pointer; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-brand">
+      <div class="nav-logo">I</div>
+      <div>
+        <h1>Al-Noor Islamiyya School</h1>
+        <p>Knowledge, Faith & Excellence</p>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-btn" onclick="goHome()">Home</button>
+      <button class="nav-btn" onclick="showAdminLogin()">🔐 Admin Login</button>
+    </div>
+  </nav>
+
+  <div id="page-home" class="page active">
+    <div class="hero">
+      <h2>Student Portal</h2>
+      <p>Select your category to begin registration</p>
+      <div class="hero-buttons">
+        <button class="btn-primary" onclick="goNewStudent()">🆕 New Student — ₦5,000</button>
+        <button class="btn-secondary" onclick="goReturningStudent()">🔄 Returning Student — ₦1,500</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>📢 Announcements</h3>
+      </div>
+      <div id="announcements-list">
+        <div class="loading"><span class="spinner"></span>Loading announcements...</div>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="icon">📚</div>
+        <h4>Islamic Studies</h4>
+        <p>Qur'an, Hadith, Fiqh & Arabic Language</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">🎓</div>
+        <h4>Modern Education</h4>
+        <p>Mathematics, Science & English</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">🏆</div>
+        <h4>Moral Excellence</h4>
+        <p>Character building & leadership</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-new-student" class="page">
+    <div class="card" style="max-width: 700px; margin: 0 auto;">
+      <span class="back-link" onclick="goHome()">← Back to Home</span>
+      <h2>📝 New Student Registration</h2>
+      <p style="color: #6b7280; margin-bottom: 1.5rem;">Registration fee: <strong style="color: #166534;">₦5,000</strong>. Please fill in all required information accurately.</p>
+      <form id="new-student-form" onsubmit="event.preventDefault(); submitNewStudent();">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input id="ns-name" type="text" placeholder="Enter full name" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date of Birth *</label>
+            <input id="ns-dob" type="date" required>
+          </div>
+          <div class="form-group">
+            <label>Gender *</label>
+            <select id="ns-gender" required>
+              <option value="">Select</option>
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Home Address *</label>
+          <textarea id="ns-address" rows="2" placeholder="Enter home address" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Class/Level Applying For *</label>
+          <select id="ns-class" required>
+            <option value="">Select Class</option>
+            <option>Nursery 1</option><option>Nursery 2</option>
+            <option>Primary 1</option><option>Primary 2</option><option>Primary 3</option><option>Primary 4</option><option>Primary 5</option><option>Primary 6</option>
+            <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
+            <option>SSS 1</option><option>SSS 2</option><option>SSS 3</option>
+          </select>
+        </div>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 0.5rem 0;">
+        <h4 style="color: #166534; margin: 0 0 1rem 0;">👨‍👩‍👧 Parent/Guardian Information</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Father's Name *</label>
+            <input id="ns-father" type="text" placeholder="Father's full name" required>
+          </div>
+          <div class="form-group">
+            <label>Father's Phone *</label>
+            <input id="ns-father-phone" type="tel" placeholder="Phone number" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Mother's Name *</label>
+            <input id="ns-mother" type="text" placeholder="Mother's full name" required>
+          </div>
+          <div class="form-group">
+            <label>Mother's Phone *</label>
+            <input id="ns-mother-phone" type="tel" placeholder="Phone number" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Parent Email</label>
+          <input id="ns-email" type="email" placeholder="Email address">
+        </div>
+        <div class="form-group">
+          <label>Upload Passport Photo</label>
+          <input id="ns-photo" type="file" accept="image/*" onchange="previewPhoto(this)">
+          <img id="photo-preview" style="display:none; width:100px; height:100px; object-fit:cover; border-radius:8px; margin-top:0.5rem; border:2px solid #e5e7eb;">
+        </div>
+        <button type="submit" class="btn-submit" id="ns-submit-btn">Proceed to Payment (₦5,000) →</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="page-returning" class="page">
+    <div class="card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+      <span class="back-link" onclick="goHome()">← Back to Home</span>
+      <h2>🔄 Returning Student</h2>
+      <p style="color: #6b7280;">School fees: <strong style="color: #166534;">₦1,500</strong>. Enter your Matriculation Number to continue.</p>
+      <div style="margin: 2rem 0;">
+        <input id="rs-matric" type="text" style="width: 100%; padding: 1rem; border: 2px solid #d1d5db; border-radius: 10px; font-size: 1.1rem; text-align: center; letter-spacing: 2px; text-transform: uppercase;" placeholder="e.g. ANIS2026001" oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <button class="btn-submit" onclick="fetchReturningStudent()" id="rs-fetch-btn">Fetch Student Info</button>
+      <div id="rs-info" style="display:none; margin-top: 1.5rem; text-align: left; background: #f0fdf4; padding: 1rem; border-radius: 10px; border: 1px solid #bbf7d0;">
+        <p style="margin: 0.25rem 0;"><strong>Name:</strong> <span id="rs-name-display"></span></p>
+        <p style="margin: 0.25rem 0;"><strong>Class:</strong> <span id="rs-class-display"></span></p>
+        <p style="margin: 0.25rem 0;"><strong>Last Session:</strong> 2025/2026</p>
+      </div>
+      <button id="rs-pay-btn" class="btn-submit" style="display:none; background: #22c55e; margin-top: 1rem;" onclick="goPayment('returning')">Proceed to Payment (₦1,500) →</button>
+    </div>
+  </div>
+
+  <div id="page-payment" class="page">
+    <div class="card" style="max-width: 500px; margin: 0 auto;">
+      <span class="back-link" onclick="goHome()">← Cancel</span>
+      <h2 style="text-align: center; color: #166534; margin-top: 0;">💳 Payment</h2>
+      <div class="amount-box">
+        <p class="label" id="pay-label">Registration Fee</p>
+        <p class="amount" id="pay-amount">₦5,000.00</p>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">Payment Method</label>
+        <div class="pay-methods">
+          <button class="pay-method active" onclick="selectMethod(this, 'remita')">Remita</button>
+          <button class="pay-method" onclick="selectMethod(this, 'bank')">Bank Transfer</button>
+          <button class="pay-method" onclick="selectMethod(this, 'card')">Card</button>
+        </div>
+      </div>
+      <div class="remita-box">
+        <p style="margin: 0 0 0.5rem 0; color: #475569; font-size: 0.9rem;"><strong>Remita Reference:</strong> <span id="remita-ref" style="font-family: monospace; background: #e2e8f0; padding: 0.2rem 0.5rem; border-radius: 4px;"></span></p>
+        <p style="margin: 0; color: #475569; font-size: 0.85rem;">Use this RRR to complete payment at any bank or via remita.net</p>
+      </div>
+      <div id="card-form" style="display: none;">
+        <input type="text" placeholder="Card Number" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 0.5rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+          <input type="text" placeholder="MM/YY" style="padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px;">
+          <input type="text" placeholder="CVV" style="padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px;">
+        </div>
+      </div>
+      <button class="btn-submit" onclick="processPayment()" id="pay-button">Pay ₦5,000.00</button>
+    </div>
+  </div>
+
+  <div id="page-admission" class="page">
+    <div class="admission-card" style="max-width: 800px; margin: 0 auto;">
+      <div class="admission-header">
+        <h2>AL-NOOR ISLAMIYYA SCHOOL</h2>
+        <p>Admission Letter & Student Profile</p>
+      </div>
+      <div class="admission-body">
+        <img id="admit-photo" class="admission-photo" src="" alt="Student Photo">
+        <div class="admission-details">
+          <p><strong>Matric No:</strong> <span id="admit-matric" style="font-family: monospace; font-size: 1.1rem; color: #dc2626;"></span></p>
+          <p><strong>Full Name:</strong> <span id="admit-name"></span></p>
+          <p><strong>Date of Birth:</strong> <span id="admit-dob"></span></p>
+          <p><strong>Gender:</strong> <span id="admit-gender"></span></p>
+          <p><strong>Class:</strong> <span id="admit-class"></span></p>
+          <p><strong>Address:</strong> <span id="admit-address"></span></p>
+        </div>
+      </div>
+      <div class="parents-box">
+        <h4>Parent/Guardian Details</h4>
+        <p style="margin: 0.2rem 0; font-size: 0.9rem;"><strong>Father:</strong> <span id="admit-father"></span> | <span id="admit-father-phone"></span></p>
+        <p style="margin: 0.2rem 0; font-size: 0.9rem;"><strong>Mother:</strong> <span id="admit-mother"></span> | <span id="admit-mother-phone"></span></p>
+      </div>
+      <div class="signature-area">
+        <div>
+          <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Date Issued: <span id="admit-date"></span></p>
+          <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Session: 2026/2027</p>
+        </div>
+        <div class="signature">
+          <div class="sign-line">Director</div>
+          <p style="margin: 0; font-size: 0.75rem; color: #6b7280;">Director's Signature</p>
+        </div>
+      </div>
+    </div>
+    <div class="flex-center mt-2">
+      <button class="btn-download btn-green" onclick="downloadDoc('acknowledgement')">📄 Download Acknowledgement</button>
+      <button class="btn-download btn-lime" onclick="downloadDoc('receipt')">🧾 Download Remita Receipt</button>
+      <button class="btn-download btn-blue" onclick="downloadDoc('admission')">🎓 Download Admission Letter</button>
+    </div>
+  </div>
+
+  <div id="page-receipt" class="page">
+    <div class="receipt-card" style="max-width: 600px; margin: 0 auto;">
+      <div class="success-icon">✓</div>
+      <h2 style="color: #166534; margin: 0;">Payment Successful!</h2>
+      <p style="color: #6b7280;">Your school fees payment has been confirmed.</p>
+      <div class="receipt-details">
+        <p><strong>Student Name:</strong> <span id="rcpt-name"></span></p>
+        <p><strong>Matric No:</strong> <span id="rcpt-matric"></span></p>
+        <p><strong>Amount Paid:</strong> <span id="rcpt-amount">₦1,500.00</span></p>
+        <p><strong>Transaction Ref:</strong> <span id="rcpt-ref"></span></p>
+        <p><strong>Date:</strong> <span id="rcpt-date"></span></p>
+        <p><strong>Status:</strong> <span style="color: #22c55e; font-weight: 600;">SUCCESSFUL</span></p>
+      </div>
+      <button class="btn-submit" onclick="downloadDoc('receipt-only')">🧾 Download Payment Receipt</button>
+    </div>
+  </div>
+
+  <div id="page-admin-login" class="page">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-icon">🔐</div>
+        <h2>Admin Login</h2>
+        <p>Administrator Access Only</p>
+      </div>
+      <form onsubmit="event.preventDefault(); adminLogin();">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input id="admin-email" type="email" placeholder="admin@alnoor.edu.ng" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input id="admin-password" type="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-submit">Login to Dashboard</button>
+      </form>
+      <p class="error-msg" id="login-error">Invalid email or password. Please try again.</p>
+    </div>
+  </div>
+
+  <div id="page-admin" class="page">
+    <div class="dash-header">
+      <div>
+        <h2>📊 Administrator Dashboard</h2>
+        <p style="color: #6b7280; margin: 0.25rem 0 0 0;">Welcome back, Administrator</p>
+      </div>
+      <button class="btn-red" onclick="adminLogout()">Logout</button>
+    </div>
+
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card" style="border-left-color: #22c55e;">
+        <p>Total Students</p>
+        <p class="value" style="color: #166534;">—</p>
+      </div>
+      <div class="stat-card" style="border-left-color: #0ea5e9;">
+        <p>New Registrations</p>
+        <p class="value" style="color: #0ea5e9;">—</p>
+      </div>
+      <div class="stat-card" style="border-left-color: #f59e0b;">
+        <p>Expected Revenue</p>
+        <p class="value" style="color: #f59e0b;">—</p>
+      </div>
+      <div class="stat-card" style="border-left-color: #8b5cf6;">
+        <p>This Month</p>
+        <p class="value" style="color: #8b5cf6;">—</p>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h4>Monthly Revenue (2026)</h4>
+        <div class="bar-chart" id="revenue-chart">
+          <div class="loading"><span class="spinner"></span>Loading...</div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.7rem; color: #9ca3af;">
+          <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h4>Student Distribution by Class</h4>
+        <div id="class-chart">
+          <div class="loading"><span class="spinner"></span>Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4>📢 Manage Announcements</h4>
+      <div style="display: grid; gap: 0.75rem; margin-bottom: 1rem;">
+        <input id="ann-title" type="text" placeholder="Announcement Title">
+        <textarea id="ann-body" rows="3" placeholder="Announcement body..."></textarea>
+        <button class="btn-small" style="width: fit-content;" onclick="postAnnouncement()">Post Announcement</button>
+      </div>
+      <div id="admin-announcements-list" style="max-height: 300px; overflow-y: auto;">
+        <div class="loading"><span class="spinner"></span>Loading...</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4>👨‍🎓 Recent Registrations</h4>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Matric No</th><th>Name</th><th>Class</th><th>Date</th><th>Status</th></tr>
+          </thead>
+          <tbody id="student-table-body">
+            <tr><td colspan="5" class="loading"><span class="spinner"></span>Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin;
+    let currentStudent = null;
+    let currentPayment = null;
+    let paymentMethod = 'remita';
+    let adminToken = null;
+
+    function formatMoney(n) {
+      return '₦' + n.toLocaleString('en-NG') + '.00';
+    }
+    function getFee() {
+      return currentStudent && currentStudent.type === 'returning' ? 1500 : 5000;
+    }
+
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+    function goHome() { showPage('home'); loadAnnouncements(); }
+    function goNewStudent() { showPage('new-student'); }
+    function goReturningStudent() { showPage('returning'); }
+    function showAdminLogin() { showPage('admin-login'); }
+    function goPayment(type) {
+      showPage('payment');
+      const fee = getFee();
+      document.getElementById('pay-amount').textContent = formatMoney(fee);
+      document.getElementById('pay-button').textContent = 'Pay ' + formatMoney(fee);
+      document.getElementById('pay-label').textContent = type === 'returning' ? 'School Fees Payment' : 'Registration Fee';
+      document.getElementById('remita-ref').textContent = 'RRR-' + Math.floor(100000000000 + Math.random() * 900000000000);
+    }
+
+    async function loadAnnouncements() {
+      try {
+        const res = await fetch(API_BASE + '/api/announcements');
+        const data = await res.json();
+        const container = document.getElementById('announcements-list');
+        if (data.success && data.announcements.length > 0) {
+          container.innerHTML = data.announcements.map(a => `
+            <div class="announcement-item">
+              <h4>${a.title}</h4>
+              <p>${a.body}</p>
+              <span class="date">Posted: ${a.date}</span>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = '<p style="color: #6b7280;">No announcements yet.</p>';
+        }
+      } catch (err) {
+        document.getElementById('announcements-list').innerHTML = '<p style="color: #dc2626;">Failed to load announcements.</p>';
+      }
+    }
+
+    function previewPhoto(input) {
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          document.getElementById('photo-preview').src = e.target.result;
+          document.getElementById('photo-preview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function submitNewStudent() {
+      const name = document.getElementById('ns-name').value;
+      const dob = document.getElementById('ns-dob').value;
+      const gender = document.getElementById('ns-gender').value;
+      const address = document.getElementById('ns-address').value;
+      const cls = document.getElementById('ns-class').value;
+      const father = document.getElementById('ns-father').value;
+      const fatherPhone = document.getElementById('ns-father-phone').value;
+      const mother = document.getElementById('ns-mother').value;
+      const motherPhone = document.getElementById('ns-mother-phone').value;
+      const email = document.getElementById('ns-email').value;
+      const photo = document.getElementById('photo-preview').style.display !== 'none' ? document.getElementById('photo-preview').src : null;
+
+      const btn = document.getElementById('ns-submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Registering...';
+
+      try {
+        const res = await fetch(API_BASE + '/api/students/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, dob, gender, address, class: cls, father, fatherPhone, mother, motherPhone, email, photo })
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentStudent = data.student;
+          goPayment('new');
+        } else {
+          alert(data.message || 'Registration failed');
+        }
+      } catch (err) {
+        alert('Network error. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Proceed to Payment (₦5,000) →';
+      }
+    }
+
+    async function fetchReturningStudent() {
+      const matric = document.getElementById('rs-matric').value.trim();
+      if (!matric) { alert('Please enter your Matric Number'); return; }
+
+      const btn = document.getElementById('rs-fetch-btn');
+      btn.disabled = true;
+      btn.textContent = 'Fetching...';
+
+      try {
+        const res = await fetch(API_BASE + '/api/students/' + matric);
+        const data = await res.json();
+        if (data.success) {
+          currentStudent = { ...data.student, type: 'returning' };
+          document.getElementById('rs-name-display').textContent = data.student.name;
+          document.getElementById('rs-class-display').textContent = data.student.class;
+          document.getElementById('rs-info').style.display = 'block';
+          document.getElementById('rs-pay-btn').style.display = 'block';
+        } else {
+          alert(data.message || 'Student not found');
+        }
+      } catch (err) {
+        alert('Network error. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Fetch Student Info';
+      }
+    }
+
+    function selectMethod(btn, method) {
+      document.querySelectorAll('.pay-method').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      paymentMethod = method;
+      document.getElementById('card-form').style.display = method === 'card' ? 'block' : 'none';
+    }
+
+    async function processPayment() {
+      const btn = document.getElementById('pay-button');
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      try {
+        const res = await fetch(API_BASE + '/api/payments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            matric: currentStudent.matric,
+            amount: getFee(),
+            method: paymentMethod,
+            type: currentStudent.type === 'new' ? 'registration' : 'school_fees'
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentPayment = data.payment;
+          if (currentStudent.type === 'new') {
+            showAdmission();
+          } else {
+            showReceipt();
+          }
+        } else {
+          alert(data.message || 'Payment failed');
+        }
+      } catch (err) {
+        alert('Network error during payment. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Pay ' + formatMoney(getFee());
+      }
+    }
+
+    function showAdmission() {
+      document.getElementById('admit-matric').textContent = currentStudent.matric;
+      document.getElementById('admit-name').textContent = currentStudent.name;
+      document.getElementById('admit-dob').textContent = currentStudent.dob;
+      document.getElementById('admit-gender').textContent = currentStudent.gender;
+      document.getElementById('admit-class').textContent = currentStudent.class;
+      document.getElementById('admit-address').textContent = currentStudent.address;
+      document.getElementById('admit-father').textContent = currentStudent.father;
+      document.getElementById('admit-father-phone').textContent = currentStudent.fatherPhone;
+      document.getElementById('admit-mother').textContent = currentStudent.mother;
+      document.getElementById('admit-mother-phone').textContent = currentStudent.motherPhone;
+      document.getElementById('admit-date').textContent = new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' });
+      document.getElementById('admit-photo').src = currentStudent.photo || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22150%22><rect fill=%22%23e5e7eb%22 width=%22120%22 height=%22150%22/><text x=%2260%22 y=%2275%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2214%22>No Photo</text></svg>';
+      showPage('admission');
+    }
+
+    function showReceipt() {
+      document.getElementById('rcpt-name').textContent = currentStudent.name;
+      document.getElementById('rcpt-matric').textContent = currentStudent.matric;
+      document.getElementById('rcpt-amount').textContent = formatMoney(getFee());
+      document.getElementById('rcpt-ref').textContent = currentPayment ? currentPayment.ref : 'TXN-' + Date.now();
+      document.getElementById('rcpt-date').textContent = new Date().toLocaleString('en-NG');
+      showPage('receipt');
+    }
+
+    function downloadDoc(type) {
+      let content = '';
+      const date = new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' });
+      const fee = getFee();
+
+      if (type === 'acknowledgement') {
+        content = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:2rem auto;padding:2rem;border:2px solid #166534;">
+          <h2 style="text-align:center;color:#166534;">ACKNOWLEDGEMENT FORM</h2>
+          <p style="text-align:center;color:#6b7280;">Al-Noor Islamiyya School</p>
+          <hr style="border:1px solid #166534;margin:1rem 0;">
+          <p><strong>Matric No:</strong> ${currentStudent.matric}</p>
+          <p><strong>Full Name:</strong> ${currentStudent.name}</p>
+          <p><strong>Class:</strong> ${currentStudent.class}</p>
+          <p><strong>Date of Birth:</strong> ${currentStudent.dob}</p>
+          <p><strong>Gender:</strong> ${currentStudent.gender}</p>
+          <p><strong>Address:</strong> ${currentStudent.address}</p>
+          <hr style="margin:1rem 0;">
+          <p><strong>Father:</strong> ${currentStudent.father} (${currentStudent.fatherPhone})</p>
+          <p><strong>Mother:</strong> ${currentStudent.mother} (${currentStudent.motherPhone})</p>
+          <hr style="margin:1rem 0;">
+          <p><strong>Registration Fee:</strong> ${formatMoney(fee)}</p>
+          <p><strong>Date:</strong> ${date}</p>
+          <p style="margin-top:2rem;text-align:center;font-size:0.85rem;color:#6b7280;">This is a computer-generated document. No signature required.</p>
+        </div>`;
+      } else if (type === 'receipt' || type === 'receipt-only') {
+        content = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:2rem auto;padding:2rem;border:2px solid #22c55e;">
+          <h2 style="text-align:center;color:#166534;">REMITA PAYMENT RECEIPT</h2>
+          <p style="text-align:center;color:#6b7280;">Al-Noor Islamiyya School</p>
+          <hr style="border:1px solid #22c55e;margin:1rem 0;">
+          <p><strong>Transaction Ref:</strong> ${currentPayment ? currentPayment.ref : 'TXN-' + Date.now()}</p>
+          <p><strong>RRR:</strong> ${currentPayment ? currentPayment.rrr : 'RRR-000000000000'}</p>
+          <p><strong>Student Name:</strong> ${currentStudent.name}</p>
+          <p><strong>Matric No:</strong> ${currentStudent.matric}</p>
+          <p><strong>Amount Paid:</strong> ${formatMoney(fee)}</p>
+          <p><strong>Payment Method:</strong> ${paymentMethod.toUpperCase()}</p>
+          <p><strong>Date:</strong> ${new Date().toLocaleString('en-NG')}</p>
+          <p><strong>Status:</strong> <span style="color:#22c55e;font-weight:bold;">SUCCESSFUL</span></p>
+          <p style="margin-top:2rem;text-align:center;font-size:0.85rem;color:#6b7280;">Thank you for your payment.</p>
+        </div>`;
+      } else if (type === 'admission') {
+        content = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:2rem auto;padding:2rem;border:3px solid #166534;">
+          <h2 style="text-align:center;color:#166534;margin:0;">AL-NOOR ISLAMIYYA SCHOOL</h2>
+          <p style="text-align:center;color:#6b7280;margin:0.25rem 0;">OFFICIAL ADMISSION LETTER</p>
+          <hr style="border:2px solid #166534;margin:1rem 0;">
+          <p style="text-align:right;"><strong>Date:</strong> ${date}</p>
+          <p>Dear <strong>${currentStudent.name}</strong>,</p>
+          <p>We are pleased to inform you that you have been offered admission into <strong>${currentStudent.class}</strong> at Al-Noor Islamiyya School for the 2026/2027 academic session.</p>
+          <p><strong>Matriculation Number:</strong> ${currentStudent.matric}</p>
+          <p>Please report to the school administration with this letter and your payment receipt for clearance.</p>
+          <p>Congratulations!</p>
+          <div style="margin-top:3rem;text-align:right;">
+            <p style="margin:0;font-family:cursive;font-size:1.3rem;">Director</p>
+            <p style="margin:0;font-size:0.85rem;color:#6b7280;">School Director</p>
+          </div>
+        </div>`;
+      }
+
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write('<html><head><title>Document</title></head><body>' + content + '</body></html>');
+      printWindow.document.close();
+      printWindow.print();
+    }
+
+    async function adminLogin() {
+      const email = document.getElementById('admin-email').value;
+      const password = document.getElementById('admin-password').value;
+      const errorEl = document.getElementById('login-error');
+
+      try {
+        const res = await fetch(API_BASE + '/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          adminToken = data.token;
+          errorEl.style.display = 'none';
+          showAdminDashboard();
+        } else {
+          errorEl.style.display = 'block';
+        }
+      } catch (err) {
+        errorEl.style.display = 'block';
+      }
+    }
+
+    function adminLogout() {
+      adminToken = null;
+      goHome();
+    }
+
+    async function showAdminDashboard() {
+      showPage('admin');
+      await Promise.all([loadAdminStats(), loadAdminStudents(), loadAdminAnnouncements()]);
+    }
+
+    async function loadAdminStats() {
+      try {
+        const res = await fetch(API_BASE + '/api/admin/stats');
+        const data = await res.json();
+        if (data.success) {
+          const s = data.stats;
+          const cards = document.querySelectorAll('#stats-grid .value');
+          cards[0].textContent = s.totalStudents.toLocaleString();
+          cards[1].textContent = s.newRegistrations.toLocaleString();
+          cards[2].textContent = formatMoney(s.totalRevenue);
+          cards[3].textContent = formatMoney(s.thisMonthRevenue);
+
+          const maxRev = Math.max(...s.monthlyRevenue);
+          document.getElementById('revenue-chart').innerHTML = s.monthlyRevenue.map(v => `
+            <div class="bar-item">
+              <div class="bar" style="height: ${(v / maxRev) * 100}%; min-height: 20px;"></div>
+              <span class="bar-label">₦${(v / 1000).toFixed(0)}k</span>
+            </div>
+          `).join('');
+
+          const dist = s.classDistribution;
+          const maxDist = Math.max(...Object.values(dist));
+          const colors = { Nursery: '#f59e0b', Primary: '#22c55e', JSS: '#0ea5e9', SSS: '#8b5cf6' };
+          document.getElementById('class-chart').innerHTML = Object.entries(dist).map(([label, value]) => `
+            <div class="horizontal-bar">
+              <span class="label">${label}</span>
+              <div class="track"><div class="fill" style="width: ${(value / maxDist) * 100}%; background: ${colors[label] || '#22c55e'};"></div></div>
+              <span class="count">${value}</span>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('Failed to load stats', err);
+      }
+    }
+
+    async function loadAdminStudents() {
+      try {
+        const res = await fetch(API_BASE + '/api/admin/students');
+        const data = await res.json();
+        const tbody = document.getElementById('student-table-body');
+        if (data.success && data.students.length > 0) {
+          tbody.innerHTML = data.students.slice().reverse().map(s => `
+            <tr>
+              <td>${s.matric}</td>
+              <td>${s.name}</td>
+              <td>${s.class}</td>
+              <td>${new Date(s.registeredAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+              <td><span class="badge">${s.paymentStatus === 'paid' ? 'Paid' : 'Pending'}</span></td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#6b7280;">No students registered yet.</td></tr>';
+        }
+      } catch (err) {
+        document.getElementById('student-table-body').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#dc2626;">Failed to load students.</td></tr>';
+      }
+    }
+
+    async function loadAdminAnnouncements() {
+      try {
+        const res = await fetch(API_BASE + '/api/announcements');
+        const data = await res.json();
+        const container = document.getElementById('admin-announcements-list');
+        if (data.success && data.announcements.length > 0) {
+          container.innerHTML = data.announcements.map((a, i) => `
+            <div class="ann-item">
+              <div class="ann-item-header">
+                <h5>${a.title}</h5>
+                <button class="btn-delete" onclick="deleteAnnouncement('${a.id}')">Delete</button>
+              </div>
+              <p>${a.body}</p>
+              <span class="date">${a.date}</span>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = '<p style="color: #6b7280;">No announcements yet.</p>';
+        }
+      } catch (err) {
+        document.getElementById('admin-announcements-list').innerHTML = '<p style="color: #dc2626;">Failed to load announcements.</p>';
+      }
+    }
+
+    async function postAnnouncement() {
+      const title = document.getElementById('ann-title').value;
+      const body = document.getElementById('ann-body').value;
+      if (!title || !body) { alert('Please fill both title and body'); return; }
+
+      try {
+        const res = await fetch(API_BASE + '/api/announcements', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, body })
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('ann-title').value = '';
+          document.getElementById('ann-body').value = '';
+          await loadAdminAnnouncements();
+          await loadAnnouncements();
+        }
+      } catch (err) {
+        alert('Failed to post announcement');
+      }
+    }
+
+    async function deleteAnnouncement(id) {
+      if (!confirm('Delete this announcement?')) return;
+      try {
+        const res = await fetch(API_BASE + '/api/announcements/' + id, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          await loadAdminAnnouncements();
+          await loadAnnouncements();
+        }
+      } catch (err) {
+        alert('Failed to delete announcement');
+      }
+    }
+
+    loadAnnouncements();
+  </script>
+</body>
+</html>
