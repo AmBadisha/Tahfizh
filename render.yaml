@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: islamiyya-school-portal
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ADMIN_EMAIL
+        value: admin@alnoor.edu.ng
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false
